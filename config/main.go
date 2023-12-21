@@ -18,6 +18,7 @@ package main
 
 import (
 	"context"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -35,7 +36,8 @@ func main() {
 	)
 
 	h.GET("/hello", func(ctx context.Context, c *app.RequestContext) {
-		c.String(consts.StatusOK, "Hello hertz!")
+		currentTime := time.Now().Format("2006-01-02 15:04:05")
+		c.String(consts.StatusOK, "Hello hertz! Current time is "+currentTime)
 	})
 
 	h.Spin()
