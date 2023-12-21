@@ -25,15 +25,24 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
+var userKey = "userInfo"
+
 func main() {
 	h := server.Default(server.WithHostPorts("127.0.0.1:8080"))
-	h.Use(basic_auth.BasicAuth(map[string]string{
-		"test1": "value1",
-		"test2": "value2",
-	}))
+	// your-realm:   安全域字符串，本例中会以 Www-Authenticate: Basic realm="your-realm" 的形式保存在响应头中
+	// your-userKey: 认证通过后会以 userKey 为键 username 为值的形式设置在上下文中
+	h.Use(basic_auth.BasicAuthForRealm(map[string]string{
+		"username3": "password3",
+		"username4": "password4",
+	}, "Authorization Required", userKey))
 
 	h.GET("/basicAuth", func(ctx context.Context, c *app.RequestContext) {
-		c.String(consts.StatusOK, "hello hertz")
+		user, exists := c.Get(userKey)
+		if exists != true {
+			c.String(consts.StatusCreated, "no user")
+		}
+		println("user", user)
+		c.String(consts.StatusOK, "user:"+user.(string))
 	})
 
 	h.Spin()
